@@ -21,8 +21,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<CoachAuthenticationService>();
 
 var conf = builder.Configuration;
+var myCorsPolicy = "_davanaCorsPolicy";
 
-builder.Services.AddCors();
+builder.Services.AddCors(options => {
+    options.AddPolicy(myCorsPolicy, policy => {
+        policy.WithOrigins("http://localhost:4200");
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+    });
+});
 builder.Services.AddAuthentication()
                 .AddJwtBearer("Bearer",
                         options => options.TokenValidationParameters = new TokenValidationParameters
@@ -55,5 +62,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(myCorsPolicy);
 app.MapControllers();
 app.Run();

@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using API.Entities;
 using API.Services.Authentication.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services.Authentication
@@ -41,7 +40,7 @@ namespace API.Services.Authentication
         }
 
         private ClaimsIdentity GenerateClaims(User entity)
-        {            
+        {
             _ = entity.EmailAddress ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.EmailAddress));
             _ = entity.Scopes ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Scopes));
             _ = entity.Roles ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Roles));
@@ -49,7 +48,7 @@ namespace API.Services.Authentication
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, entity.EmailAddress));
             claims.AddClaim(new Claim("sub", entity.EmailAddress));
-            claims.AddClaim(new Claim("jti", "vv"));
+            claims.AddClaim(new Claim("jti", DateTime.Now.ToBinary().ToString() + entity.Id));
 
             foreach (var scope in entity.Scopes)
                 claims.AddClaim(new Claim("scope", scope));

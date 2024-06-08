@@ -1,6 +1,6 @@
+using API.Data.DTO;
 using API.Data.Interfaces;
 using API.Entities;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data.Repositories
@@ -11,23 +11,49 @@ namespace API.Data.Repositories
         {
         }
 
-        public async Task<List<Appointment>> GetAppointments()
+        public async Task<List<AppointmentDTO>> GetAppointments()
         {
-            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE ap.active = 1 ").ToListAsync();
-            return data;
+            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap")
+                .Select(a => new AppointmentDTO
+                {
+                    Id = a.Id,
+                    CoachId = a.CoachId,
+                    UserId = a.UserId,
+                    Date = a.Date,
+                    Comment = a.Comment,
+                    MeetingType = a.MeetingType,
+                    Approoved = a.Approoved
+                }
+
+                ).ToListAsync();
+            return data ?? new List<AppointmentDTO>();
         }
 
-        public async Task<List<Appointment>> GetAppointmentsByCoachID(int coachID)
+        public async Task<List<AppointmentDTO>> GetAppointmentsByCoachID(int coachID)
         {
 
-            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE ap.coachid = {coachID} and ap.active = 1").ToListAsync();
-            return data;
+            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE ap.coachid = {coachID}")
+                .Select(a => new AppointmentDTO
+                {
+                    Id = a.Id,
+                    CoachId = a.CoachId,
+                    UserId = a.UserId,
+                    Date = a.Date,
+                    Comment = a.Comment,
+                    MeetingType = a.MeetingType,
+                    Approoved = a.Approoved
+                }
+
+            ).OrderBy(a => a.Date).ToListAsync();
+            return data ?? new List<AppointmentDTO>();
+
 
         }
 
         public async Task<Appointment> GetAppointmentsByIDHash(string IDHash)
         {
-            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE SHA(ap.id) = {IDHash} and ap.active = 1").FirstOrDefaultAsync();
+            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE SHA(ap.id) = {IDHash} and ap.active = 1")
+                .FirstOrDefaultAsync();
             return data ?? new Appointment();
         }
     }

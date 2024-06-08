@@ -1,3 +1,4 @@
+using API.Data.DTO;
 using API.Data.Interfaces;
 using API.Entities;
 using API.Services.Authentication;
@@ -24,13 +25,14 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpGet("all")]
-        public async Task<ActionResult<List<Coach>>> GetCoaches()
+        public async Task<ActionResult<List<CoachDTO>>> GetCoaches()
         {
             return new OkObjectResult(await _coachRepository.GetCoaches());
         }
 
+        [AllowAnonymous]
         [HttpGet("coach/{coachID}")]
-        public async Task<ActionResult<Coach>> GetCoach(int coachID)
+        public async Task<ActionResult<CoachDTO>> GetCoach(int coachID)
         {                       
             if (coachID == 0)
                 return new BadRequestObjectResult("Coach ID cannot be 0");
@@ -97,7 +99,7 @@ namespace API.Controllers
             //password needs to be hashed - will be hashed on Client Side           
             var coach = await _coachRepository.CheckCoachCredentials(credentials);
 
-            if (coach == null)
+            if (coach.Id == 0)
                 return new BadRequestObjectResult("Something went Wrong");
 
             var tokenresult = await _coachAuthenticationService.GenerateToken(coach);
