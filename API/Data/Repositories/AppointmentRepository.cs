@@ -11,6 +11,12 @@ namespace API.Data.Repositories
         {
         }
 
+        public async Task<Appointment> GetAppointmentByID(int appointmentID)
+        {
+            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Appointments ap WHERE ap.id = {appointmentID}").FirstOrDefaultAsync();
+            return data ?? new Appointment();
+        }
+
         public async Task<List<AppointmentDTO>> GetAppointments()
         {
             var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap")
@@ -32,7 +38,7 @@ namespace API.Data.Repositories
         public async Task<List<AppointmentDTO>> GetAppointmentsByCoachID(int coachID)
         {
 
-            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE ap.coachid = {coachID}")
+            var data = await _dbSet.FromSql($"SELECT * FROM Appointments ap WHERE ap.coachid = {coachID} and ap.userid = 0")
                 .Select(a => new AppointmentDTO
                 {
                     Id = a.Id,

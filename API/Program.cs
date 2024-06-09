@@ -19,12 +19,15 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ICoachRepository, CoachRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<CoachAuthenticationService>();
+builder.Services.AddScoped<UserAuthenticationService>();
 
 var conf = builder.Configuration;
 var myCorsPolicy = "_davanaCorsPolicy";
 
-builder.Services.AddCors(options => {
-    options.AddPolicy(myCorsPolicy, policy => {
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(myCorsPolicy, policy =>
+    {
         policy.WithOrigins("http://localhost:4200");
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();

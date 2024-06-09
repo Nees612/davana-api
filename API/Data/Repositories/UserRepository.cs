@@ -25,21 +25,28 @@ namespace API.Data.Repositories
         }
 
         public async Task<User> GetUser(int userID)
-        {            
+        {
 
-            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE us.active = 1 and us.id = {userID}").FirstOrDefaultAsync();
+            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE and us.id = {userID}").FirstOrDefaultAsync();
             return data ?? new User();
+        }
+
+        public async Task<User> GetUserByEmailHash(string EmailHash)
+        {
+            var data = await _dbSet.FromSql($"SELECT * FROM Users us WHERE SHA(us.emailaddress) = {EmailHash}").FirstOrDefaultAsync();
+            return data ?? new User();
+
         }
 
         public async Task<int> GetUserIDByIDHash(string IDHash)
         {
-            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE SHA(us.id) = {IDHash} and us.active = 1").FirstOrDefaultAsync();
+            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE SHA(us.id) = {IDHash}").FirstOrDefaultAsync();
             return data == null ? 0 : data.Id;
         }
 
         public async Task<List<User>> GetUsers()
         {
-            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE us.active = 1 ").ToListAsync();
+            var data = await _dbSet.FromSqlInterpolated($"SELECT * FROM Users us WHERE").ToListAsync();
             return data;
         }
     }

@@ -7,7 +7,8 @@ namespace API.Data.Interfaces
     {
         Task<List<User>> GetUsers();
         Task<User> GetUser(int userID);
-        Task<User> CheckUserCredentials(Credentials signInCredentials);
+        Task<User> GetUserByEmailHash(string EmailHash);
         Task<int> GetUserIDByIDHash(string IDHash);
+        Task<User> CheckUserCredentials(Credentials signInCredentials);
     }
 }

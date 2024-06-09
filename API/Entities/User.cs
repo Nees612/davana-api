@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace API.Entities
 {
     public class User : BaseEntity
@@ -11,6 +13,8 @@ namespace API.Entities
         public string[]? Roles { get; set; }
         public string[]? Scopes { get; set; }
         public string? PhoneNumber { get; set; }
+
+        [DefaultValue(0)]
         public int EmailVerified { get; set; }
     }
 }
