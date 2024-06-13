@@ -1,7 +1,8 @@
 using System.Text.Json;
-using API.Data.Interfaces;
+using API.Data.Repositories.Interfaces;
 using API.Entities;
 using API.Services.Authentication;
+using API.Services.Authentication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

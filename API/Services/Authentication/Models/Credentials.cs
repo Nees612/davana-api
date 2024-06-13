@@ -1,4 +1,5 @@
-namespace API.Services.Authentication
+namespace API.Services.Authentication.Models
+
 {
     public class Credentials
     {

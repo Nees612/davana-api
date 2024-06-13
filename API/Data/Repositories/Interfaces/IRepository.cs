@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Data.Interfaces
+namespace API.Data.Repositories.Interfaces
 {
     public interface IRepository<T> where T : class
     {

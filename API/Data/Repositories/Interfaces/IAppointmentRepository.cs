@@ -1,8 +1,7 @@
 using API.Data.DTO;
 using API.Entities;
-using Microsoft.AspNetCore.Mvc;
 
-namespace API.Data.Interfaces
+namespace API.Data.Repositories.Interfaces
 {
     public interface IAppointmentRepository : IRepository<Appointment>
     {

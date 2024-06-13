@@ -1,7 +1,7 @@
 using API.Entities;
-using API.Services.Authentication;
+using API.Services.Authentication.Models;
 
-namespace API.Data.Interfaces
+namespace API.Data.Repositories.Interfaces
 {
     public interface IUserRepository : IRepository<User>
     {

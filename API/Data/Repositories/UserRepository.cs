@@ -1,6 +1,6 @@
-using API.Data.Interfaces;
+using API.Data.Repositories.Interfaces;
 using API.Entities;
-using API.Services.Authentication;
+using API.Services.Authentication.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data.Repositories

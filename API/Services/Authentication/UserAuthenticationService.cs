@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using API.Entities;
 using API.Services.Authentication.Interfaces;
+using API.Services.Authentication.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services.Authentication

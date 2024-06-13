@@ -1,7 +1,8 @@
 using API.Data.DTO;
-using API.Data.Interfaces;
+using API.Data.Repositories.Interfaces;
 using API.Entities;
 using API.Services.Authentication;
+using API.Services.Authentication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +34,7 @@ namespace API.Controllers
         [AllowAnonymous]
         [HttpGet("coach/{coachID}")]
         public async Task<ActionResult<CoachDTO>> GetCoach(int coachID)
-        {                       
+        {
             if (coachID == 0)
                 return new BadRequestObjectResult("Coach ID cannot be 0");
 

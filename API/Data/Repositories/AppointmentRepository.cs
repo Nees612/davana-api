@@ -1,5 +1,5 @@
 using API.Data.DTO;
-using API.Data.Interfaces;
+using API.Data.Repositories.Interfaces;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 

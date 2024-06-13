@@ -1,4 +1,4 @@
-using API.Data.Interfaces;
+using API.Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -80,7 +80,7 @@ namespace API.Data.Repositories
         public async Task<ActionResult> RemoveRange(IEnumerable<T> entities)
         {
             _ = entities ?? throw new ArgumentException("Parameter cannot be null", nameof(entities));
-            
+
             try
             {
                 await Task.Run(() => { _dbSet.RemoveRange(entities); });
