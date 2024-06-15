@@ -1,8 +1,12 @@
 using System.Text;
+using Amazon.DynamoDBv2.DataModel;
 using API.Data;
-using API.Data.Interfaces;
 using API.Data.Repositories;
+using API.Data.Repositories.Interfaces;
+using API.Entities;
 using API.Services.Authentication;
+using API.Services.Authentication.Interfaces;
+using API.Services.Authentication.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,8 +22,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ICoachRepository, CoachRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<CoachAuthenticationService>();
-builder.Services.AddScoped<UserAuthenticationService>();
+
+builder.Services.AddScoped<IAuthenticationService<Coach>, CoachAuthenticationService>();
+builder.Services.AddScoped<IAuthenticationService<User>, UserAuthenticationService>();
 
 var conf = builder.Configuration;
 var myCorsPolicy = "_davanaCorsPolicy";
@@ -50,9 +55,11 @@ builder.Services.AddAuthorizationBuilder()
     policy => policy.RequireRole("user")
                     .RequireClaim("scope", "booking"));
 
+
 builder.Services.AddDbContext<DavanaContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    // New Option required for using DynamoDB
 });
 
 var app = builder.Build();

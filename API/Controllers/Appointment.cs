@@ -1,3 +1,6 @@
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Runtime;
 using API.Data.Repositories.Interfaces;
 using API.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +18,30 @@ namespace API.Controllers
         {
             _logger = logger;
             _appointmentRepository = appointmentRepository;
+        }
+
+        ///ONLY TEST AWS DUMMY POINT DELETE AFTER
+        [AllowAnonymous]
+        [HttpGet("awstest")]
+        public void TestAws()
+        {
+            AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig();
+            ;
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(clientConfig);
+
+            try
+            {
+                DynamoDBContext context = new DynamoDBContext(client);
+                // Get an item.
+                GetBook(context, 101);
+
+
+                Console.WriteLine("To continue, press Enter");
+                Console.ReadLine();
+            }
+            catch (AmazonDynamoDBException e) { Console.WriteLine(e.Message); }
+            catch (AmazonServiceException e) { Console.WriteLine(e.Message); }
+            catch (Exception e) { Console.WriteLine(e.Message); }
         }
 
         [AllowAnonymous]
@@ -61,5 +88,36 @@ namespace API.Controllers
             return result;
         }
 
+        private static async void GetBook(DynamoDBContext context, int productId)
+        {
+            testtable bookItem = await context.LoadAsync<testtable>("asdasd", "asdasdasds");
+
+            Console.WriteLine("\nGetBook: Printing result.....");
+            Console.WriteLine("Title: {0} \n No.Of threads:{1}",
+                      bookItem.testid, bookItem.testdate);
+        }
+
+
+
+        ///ONLY TEST AWS DUMMY POINT DELETE AFTER
+        [DynamoDBTable("test-table")]
+        public class testtable
+        {
+            [DynamoDBHashKey] //Partition key
+            public string testid
+            {
+                get; set;
+            }
+
+            [DynamoDBRangeKey] //Sort key
+            public string testdate
+            {
+                get; set;
+            }
+
+        }
     }
+
+
+
 }
