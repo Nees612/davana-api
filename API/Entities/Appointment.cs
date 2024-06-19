@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using Amazon.DynamoDBv2.DataModel;
 
 namespace API.Entities
 {
+    [DynamoDBTable("Appointmets")]
     public class Appointment : BaseEntity
     {
         public int Id { get; set; }

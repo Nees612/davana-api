@@ -1,7 +1,10 @@
 using System.ComponentModel;
+using Amazon.DynamoDBv2.DataModel;
 
 namespace API.Entities
 {
+
+    [DynamoDBTable("Users")]
     public class User : BaseEntity
     {
         public int Id { get; set; }
