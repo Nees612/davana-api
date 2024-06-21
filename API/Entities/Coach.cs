@@ -6,8 +6,9 @@ namespace API.Entities
     [DynamoDBTable("Coaches")]
     public class Coach : BaseEntity
     {
-        [DynamoDBHashKey("id")]
-        public int Id { get; set; }
+
+        [DynamoDBHashKey]
+        public string? Id { get; set; }
 
         [DynamoDBProperty("firstName")]
         public string? FirstName { get; set; }
@@ -23,10 +24,10 @@ namespace API.Entities
         public string? PasswordHash { get; set; }
 
         [DynamoDBProperty("roles")]
-        public string[]? Roles { get; set; }
+        public string[]? Roles { get; set; } = ["coach"];
 
         [DynamoDBProperty("scopes")]
-        public string[]? Scopes { get; set; }
+        public string[]? Scopes { get; set; } = ["timetable"];
 
         [DynamoDBProperty("phoneNumber")]
         public string? PhoneNumber { get; set; }

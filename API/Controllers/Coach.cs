@@ -1,3 +1,4 @@
+using Amazon.DynamoDBv2.DocumentModel;
 using API.Data.DTO;
 using API.Data.Repositories.Interfaces;
 using API.Entities;
@@ -14,37 +15,33 @@ namespace API.Controllers
     public class CoachController : Controller
     {
         private readonly ILogger<CoachController> _logger;
-        private readonly ICoachRepository _coachRepository;
         private readonly CoachAuthenticationService _coachAuthenticationService;
         private readonly ICoachesDynamoRepository _coachesDynamoRepository;
 
-        public CoachController(ILogger<CoachController> logger, ICoachRepository coachRepository, CoachAuthenticationService coachAuthenticationService, ICoachesDynamoRepository coachesDynamoRepository)
+        public CoachController(ILogger<CoachController> logger, CoachAuthenticationService coachAuthenticationService, ICoachesDynamoRepository coachesDynamoRepository)
         {
             _coachesDynamoRepository = coachesDynamoRepository;
             _coachAuthenticationService = coachAuthenticationService;
-            _coachRepository = coachRepository;
             _logger = logger;
         }
 
         [AllowAnonymous]
         [HttpGet("all")]
-        public async Task<ActionResult<List<CoachDTO>>> GetCoaches()
+        public async Task<ActionResult<List<Document>>> GetCoaches()
         {
-            return new OkObjectResult(await _coachRepository.GetCoaches());
+            return new OkObjectResult(await _coachesDynamoRepository.GetCoaches());
         }
 
         [AllowAnonymous]
         [HttpGet("coach/{coachID}")]
-        public async Task<ActionResult<CoachDTO>> GetCoach(int coachID)
+        public async Task<ActionResult<Coach>> GetCoach(string coachID)
         {
-            if (coachID == 0)
-                return new BadRequestObjectResult("Coach ID cannot be 0");
+            if (coachID == string.Empty)
+                return new BadRequestObjectResult("Coach ID cannot be empty");
 
+            var coach = await _coachesDynamoRepository.GetCoach(coachID);
 
-            // var coach = await _coachRepository.GetCoach(coachID);
-            var coach = await _coachesDynamoRepository.GetByIdAsync(coachID.ToString());
-
-            if (coach.Id == 0)
+            if (coach == null)
                 return new BadRequestObjectResult("Something went wrong");
 
             return new OkObjectResult(coach);
@@ -58,14 +55,16 @@ namespace API.Controllers
             if (coach == null)
                 return new BadRequestObjectResult("Coach cannot be null");
 
-            var result = await _coachRepository.Add(coach);
+            try
+            {
+                await _coachesDynamoRepository.PutCoach(coach);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            _coachesDynamoRepository.PutItem(coach);
-
-            if (result.GetType() == typeof(OkObjectResult))
-                await _coachRepository.SaveChangesAsync();
-
-            return result;
+            return new OkObjectResult("Coach created successfully!");
         }
 
         [HttpPost("coach-update")]
@@ -74,26 +73,35 @@ namespace API.Controllers
             if (coach == null)
                 return new BadRequestObjectResult("Coach cannot be null");
 
-            var result = await _coachRepository.Update(coach);
+            try
+            {
+                await _coachesDynamoRepository.SaveAsync(coach);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            if (result.GetType() == typeof(OkObjectResult))
-                await _coachRepository.SaveChangesAsync();
-
-            return result;
+            return new OkObjectResult("Succesfully saved");
         }
 
+        [AllowAnonymous]
         [HttpDelete("coach-delete")]
         public async Task<ActionResult> DeleteCoach([FromBody] Coach coach)
         {
             if (coach == null)
                 return new BadRequestObjectResult("Coach cannot be null");
 
-            var result = await _coachRepository.Remove(coach);
+            try
+            {
+                await _coachesDynamoRepository.DeleteByIdAsync(coach);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            if (result.GetType() == typeof(OkObjectResult))
-                await _coachRepository.SaveChangesAsync();
-
-            return result;
+            return new OkObjectResult("Succesfully removed");
         }
 
         [AllowAnonymous]
@@ -104,9 +112,9 @@ namespace API.Controllers
                 return new BadRequestObjectResult("Credentials cannot be empty");
 
             //password needs to be hashed - will be hashed on Client Side           
-            var coach = await _coachRepository.CheckCoachCredentials(credentials);
+            var coach = await _coachesDynamoRepository.CheckCoachCredentials(credentials);
 
-            if (coach.Id == 0)
+            if (coach.Id == string.Empty)
                 return new BadRequestObjectResult("Something went Wrong");
 
             var tokenresult = await _coachAuthenticationService.GenerateToken(coach);

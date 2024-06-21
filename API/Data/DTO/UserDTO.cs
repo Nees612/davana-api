@@ -1,8 +1,11 @@
-using System.Security.Cryptography.X509Certificates;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace API.Data.DTO
 {
-    public static class CoachDTO
+    public static class UserDTO
     {
         private static readonly List<string> attributesToGet = [
                     "Id",
@@ -12,11 +15,8 @@ namespace API.Data.DTO
                     "emailAddress",
                     "roles",
                     "scopes",
-                    "phoneNumber",
-                    "profileImageURL",
-                    "aboutMe",
-                    "closestWorkAddress"
-                        ];
+                    "phoneNumber"
+                    ];
         public static List<string> AttributesToGet { get => attributesToGet; }
     }
 }

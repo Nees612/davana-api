@@ -10,29 +10,29 @@ namespace API.Controllers
     public class BookingController : Controller
     {
         private readonly ILogger<BookingController> _logger;
-        private readonly IAppointmentRepository _appointmentRepository;
-        private readonly IUserRepository _userRepository;
         private readonly UserAuthenticationService _userAuthenticationService;
+        private readonly IUsersDynamoRepository _usersDynamoRepository;
+        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository;
 
-        public BookingController(ILogger<BookingController> logger, IAppointmentRepository appointmentRepository, IUserRepository userRepository, UserAuthenticationService userAuthenticationService)
+        public BookingController(ILogger<BookingController> logger, IAppointmentDynamoRepository appointmentDynamoRepository, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService)
         {
+            _appointmentDynamoRepository = appointmentDynamoRepository;
+            _usersDynamoRepository = usersDynamoRepository;
             _userAuthenticationService = userAuthenticationService;
-            _userRepository = userRepository;
-            _appointmentRepository = appointmentRepository;
             _logger = logger;
         }
 
         [Authorize("user")]
         [HttpPost("start-booking")]
-        public async Task<ActionResult> StartBooking([FromBody] int appointmentID)
+        public async Task<ActionResult> StartBooking([FromBody] string appointmentID)
         {
 
-            if (appointmentID == 0)
+            if (appointmentID == string.Empty)
                 return new BadRequestObjectResult("Something went wrong");
 
-            var result = await _appointmentRepository.GetAppointmentByID(appointmentID);
+            var result = await _appointmentDynamoRepository.GetAppointment(appointmentID);
 
-            if (result.Id == 0)
+            if (result.Id == string.Empty)
                 return new BadRequestObjectResult("Something went wrong");
 
 
@@ -61,7 +61,7 @@ namespace API.Controllers
         //     if (appointmentIDHash == null || userIDHash == null)
         //         return new BadRequestObjectResult("Something went wrong");
 
-        //     var result = await _appointmentRepository.GetAppointmentsByIDHash(appointmentIDHash);
+        //     var result = await _appointmentDynamoRepository.GetAppointmentsByIDHash(appointmentIDHash);
         //     if (result.Id == 0)
         //         return new BadRequestObjectResult("Something went wrong");
 
@@ -71,8 +71,8 @@ namespace API.Controllers
 
         //     result.UserId = userID;
         //     result.LastUpdatedOn = DateTime.UtcNow;
-        //     await _appointmentRepository.Update(result);
-        //     await _appointmentRepository.SaveChangesAsync();
+        //     await _appointmentDynamoRepository.Update(result);
+        //     await _appointmentDynamoRepository.SaveChangesAsync();
 
         //     //Send notif to Coach -- Send notif to user for waiting approoval from coach
         //     //With Sendlayer EMAIL service 

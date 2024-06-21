@@ -7,7 +7,7 @@ namespace API.Entities
     {
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public int CreatedBy { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
@@ -15,9 +15,9 @@ namespace API.Entities
         public int LastUpdatedBy { get; set; }
 
         [DefaultValue(1)]
-        public int Active { get; set; }
+        public int Active { get; set; } = 1;
 
         [DefaultValue(1)]
-        public int RowVersionStamp { get; set; }
+        public int RowVersionStamp { get; set; } = 1;
     }
 }

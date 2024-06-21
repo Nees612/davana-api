@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Amazon.DynamoDBv2.DataModel;
 
 namespace API.Entities
@@ -6,16 +5,20 @@ namespace API.Entities
     [DynamoDBTable("Appointmets")]
     public class Appointment : BaseEntity
     {
-        public int Id { get; set; }
-        public int CoachId { get; set; }
+        [DynamoDBHashKey]
+        public string? Id { get; set; }
+        [DynamoDBProperty("coachId")]
+        public string? CoachId { get; set; }
+        [DynamoDBProperty("date")]
         public DateTime Date { get; set; }
+        [DynamoDBProperty("comment")]
         public string? Comment { get; set; }
+        [DynamoDBProperty("meetingType")]
         public string? MeetingType { get; set; }
-
-        [DefaultValue(0)]
-        public int UserId { get; set; }
-        [DefaultValue(0)]
-        public int Approoved { get; set; }
+        [DynamoDBProperty("userId")]
+        public int UserId { get; set; } = 0;
+        [DynamoDBProperty("approoved")]
+        public int Approoved { get; set; } = 0;
 
     }
 }

@@ -13,27 +13,25 @@ namespace API.Controllers
     public class AppointmentController : Controller
     {
         private readonly ILogger<AppointmentController> _logger;
-        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository;
 
-        public AppointmentController(ILogger<AppointmentController> logger, IAppointmentRepository appointmentRepository)
+        public AppointmentController(ILogger<AppointmentController> logger, IAppointmentDynamoRepository appointmentDynamoRepository)
         {
-
+            _appointmentDynamoRepository = appointmentDynamoRepository;
             _logger = logger;
-            _appointmentRepository = appointmentRepository;
         }
 
-        [AllowAnonymous]
         [HttpGet("all")]
         public async Task<ActionResult<List<Appointment>>> GetAppointmens()
         {
-            return new OkObjectResult(await _appointmentRepository.GetAppointments());
+            return new OkObjectResult(await _appointmentDynamoRepository.GetAppointments());
         }
 
         [AllowAnonymous]
         [HttpGet("coach-appointments/{coachID}")]
-        public async Task<ActionResult<List<Appointment>>> GetAppointmentsByCoachID(int coachID)
+        public async Task<ActionResult<List<Appointment>>> GetAppointmentsByCoachID(string coachID)
         {
-            return new OkObjectResult(await _appointmentRepository.GetAppointmentsByCoachID(coachID));
+            return new OkObjectResult(await _appointmentDynamoRepository.GetAppointmentsByCoachID(coachID));
         }
 
         [Authorize("coach")]
@@ -43,12 +41,16 @@ namespace API.Controllers
             if (appointment == null)
                 return new BadRequestObjectResult("Appointment cannot be null.");
 
-            var result = await _appointmentRepository.Add(appointment);
+            try
+            {
+                var result = await _appointmentDynamoRepository.PutAppointment(appointment);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            if (result.GetType() == typeof(OkObjectResult))
-                await _appointmentRepository.SaveChangesAsync();
-
-            return result;
+            return new OkObjectResult("Succesfully saved");
         }
 
         [Authorize("coach")]
@@ -58,12 +60,16 @@ namespace API.Controllers
             if (appointment == null)
                 return new BadRequestObjectResult("Appointment cannot be null.");
 
-            var result = await _appointmentRepository.Remove(appointment);
+            try
+            {
+                await _appointmentDynamoRepository.DeleteByIdAsync(appointment);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            if (result.GetType() == typeof(OkObjectResult))
-                await _appointmentRepository.SaveChangesAsync();
-
-            return result;
+            return new OkObjectResult("Succesfully removed");
         }
 
     }

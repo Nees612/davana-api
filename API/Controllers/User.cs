@@ -14,21 +14,21 @@ namespace API.Controllers
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
-        private readonly IUserRepository _userRepository;
         private readonly UserAuthenticationService _userAuthenticationService;
+        private readonly IUsersDynamoRepository _usersDynamoRepository;
 
-        public UserController(ILogger<UserController> logger, IUserRepository userRepository, UserAuthenticationService userAuthenticationService)
+        public UserController(ILogger<UserController> logger, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService)
         {
+            _usersDynamoRepository = usersDynamoRepository;
             _userAuthenticationService = userAuthenticationService;
-            _userRepository = userRepository;
             _logger = logger;
         }
 
-        [HttpGet("all")]
-        public async Task<ActionResult<List<User>>> GetUsers()
-        {
-            return new OkObjectResult(await _userRepository.GetUsers());
-        }
+        // [HttpGet("all")]
+        // public async Task<ActionResult<List<User>>> GetUsers()
+        // {
+        //     return new OkObjectResult(await _usersDynamoRepository.GetUsers());
+        // }
 
         [HttpGet("isTokenValid")]
         public async Task<ActionResult> IsTokenValid()
@@ -37,14 +37,14 @@ namespace API.Controllers
         }
 
         [HttpGet("user/{userID}")]
-        public async Task<ActionResult<User>> GetUser(int userID)
+        public async Task<ActionResult<User>> GetUser(string userID)
         {
-            if (userID == 0)
+            if (userID == string.Empty)
                 return new BadRequestObjectResult("UserID cannot be null");
 
-            var result = await _userRepository.GetUser(userID);
+            var result = await _usersDynamoRepository.GetUser(userID);
 
-            if (result.Id == 0)
+            if (result.Id == string.Empty)
                 return new BadRequestObjectResult("Something went wrong");
 
             return new OkObjectResult(result);
@@ -57,31 +57,36 @@ namespace API.Controllers
             if (user == null)
                 return new BadRequestObjectResult("User cannot be null");
 
-            var result = await _userRepository.Add(user);
+            try
+            {
+                var result = await _usersDynamoRepository.PutUser(user);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Something went wrong {ex.Message}");
+            }
 
-            if (result.GetType() == typeof(OkObjectResult))
-                await _userRepository.SaveChangesAsync();
-
-            return result;
-        }
-
-        [AllowAnonymous]
-        [HttpGet("verify-email/{emailHash}")]
-        public async Task<ActionResult> VerifyUserEmail(string emailHash)
-        {
-            if (emailHash == null)
-                return new BadRequestObjectResult("Something went wrong");
-
-            var result = await _userRepository.GetUserByEmailHash(emailHash);
-
-            if (result == null)
-                return new BadRequestObjectResult("Something went wrong");
-
-            result.EmailVerified = 1;
-
-            return await _userRepository.Update(result);
+            return new OkObjectResult("Coach created successfully!");
 
         }
+
+        // [AllowAnonymous]
+        // [HttpGet("verify-email/{emailHash}")]
+        // public async Task<ActionResult> VerifyUserEmail(string emailHash)
+        // {
+        //     if (emailHash == null)
+        //         return new BadRequestObjectResult("Something went wrong");
+
+        //     var result = await _usersDynamoRepository.GetUserByEmailHash(emailHash);
+
+        //     if (result == null)
+        //         return new BadRequestObjectResult("Something went wrong");
+
+        //     result.EmailVerified = 1;
+
+        //     return await _usersDynamoRepository.Update(result);
+
+        // }
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -90,7 +95,7 @@ namespace API.Controllers
             if (credentials == null)
                 return new BadRequestObjectResult("Credentials cannot be null");
 
-            var result = await _userRepository.CheckUserCredentials(credentials);
+            var result = await _usersDynamoRepository.CheckUserCredentials(credentials);
 
             if (result == null)
                 return new BadRequestObjectResult("Something went wrong");
