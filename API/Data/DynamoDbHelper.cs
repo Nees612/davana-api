@@ -1,8 +1,8 @@
 using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
+using API.Data.DynamoDbTablesCreateRequests;
 
-namespace API.Extensions.DynamoDbExtensions
+namespace API.Data
 {
     class DynamoDbHelper : IDisposable
     {
