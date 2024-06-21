@@ -36,10 +36,11 @@ namespace API.Services.SimpleNotification
                     publishRequest.MessageGroupId = message.MessageGroupId;
                 }
 
-                foreach (var (key, value) in message.MessageAttributes)
-                {
-                    publishRequest.MessageAttributes.Add(key, new MessageAttributeValue { DataType = "String", StringValue = value });
-                }
+                if (message.MessageAttributes != null)
+                    foreach (var (key, value) in message.MessageAttributes)
+                    {
+                        publishRequest.MessageAttributes.Add(key, new MessageAttributeValue { DataType = "String", StringValue = value });
+                    }
 
                 _logger.LogAppInfo($"Publishing message with ID {message.Subject} to topic {topicArn}");
                 publishTasks.Add(_snsClient.PublishAsync(publishRequest));
