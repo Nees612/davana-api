@@ -11,18 +11,11 @@ namespace API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize("user")]
-    public class UserController : Controller
+    public class UserController(ILogger<UserController> logger, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService) : Controller
     {
-        private readonly ILogger<UserController> _logger;
-        private readonly UserAuthenticationService _userAuthenticationService;
-        private readonly IUsersDynamoRepository _usersDynamoRepository;
-
-        public UserController(ILogger<UserController> logger, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService)
-        {
-            _usersDynamoRepository = usersDynamoRepository;
-            _userAuthenticationService = userAuthenticationService;
-            _logger = logger;
-        }
+        private readonly ILogger<UserController> _logger = logger;
+        private readonly UserAuthenticationService _userAuthenticationService = userAuthenticationService;
+        private readonly IUsersDynamoRepository _usersDynamoRepository = usersDynamoRepository;
 
         // [HttpGet("all")]
         // public async Task<ActionResult<List<User>>> GetUsers()

@@ -4,14 +4,9 @@ using API.Data.Repositories.Interfaces;
 
 namespace API.Data.Repositories
 {
-    public class DynamoDbRepository<T> : IDynamoDBRepository<T> where T : class
+    public class DynamoDbRepository<T>(IDavanaDynamoDBContext context) : IDynamoDBRepository<T> where T : class
     {
-        private IDavanaDynamoDBContext _context;
-
-        public DynamoDbRepository(IDavanaDynamoDBContext context)
-        {
-            _context = context;
-        }
+        private IDavanaDynamoDBContext _context = context;
 
         public async Task DeleteByIdAsync(T item)
         {

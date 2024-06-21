@@ -7,15 +7,10 @@ using API.Services.Authentication.Models;
 
 namespace API.Data.Repositories
 {
-    public class CoachesDynamoRepository : DynamoDbRepository<Coach>, ICoachesDynamoRepository
+    public class CoachesDynamoRepository(IDavanaDynamoDBContext context) : DynamoDbRepository<Coach>(context), ICoachesDynamoRepository
     {
-        private readonly Table _table;
-        private readonly IDavanaDynamoDBContext _context;
-        public CoachesDynamoRepository(IDavanaDynamoDBContext context) : base(context)
-        {
-            _context = context;
-            _table = context.Coaches;
-        }
+        private readonly Table _table = context.Coaches;
+        private readonly IDavanaDynamoDBContext _context = context;
 
         public async Task<Coach> CheckCoachCredentials(Credentials credentials)
         {

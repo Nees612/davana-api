@@ -8,15 +8,10 @@ using API.Services.Authentication.Models;
 
 namespace API.Data.Repositories
 {
-    public class UsersDynamoRepository : DynamoDbRepository<User>, IUsersDynamoRepository
+    public class UsersDynamoRepository(IDavanaDynamoDBContext context) : DynamoDbRepository<User>(context), IUsersDynamoRepository
     {
-        private readonly Table _table;
-        private readonly IDavanaDynamoDBContext _context;
-        public UsersDynamoRepository(IDavanaDynamoDBContext context) : base(context)
-        {
-            _context = context;
-            _table = context.Users;
-        }
+        private readonly Table _table = context.Users;
+        private readonly IDavanaDynamoDBContext _context = context;
 
         public async Task<User> CheckUserCredentials(Credentials credentials)
         {

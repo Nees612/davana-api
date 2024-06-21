@@ -7,20 +7,12 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookingController : Controller
+    public class BookingController(ILogger<BookingController> logger, IAppointmentDynamoRepository appointmentDynamoRepository, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService) : Controller
     {
-        private readonly ILogger<BookingController> _logger;
-        private readonly UserAuthenticationService _userAuthenticationService;
-        private readonly IUsersDynamoRepository _usersDynamoRepository;
-        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository;
-
-        public BookingController(ILogger<BookingController> logger, IAppointmentDynamoRepository appointmentDynamoRepository, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService)
-        {
-            _appointmentDynamoRepository = appointmentDynamoRepository;
-            _usersDynamoRepository = usersDynamoRepository;
-            _userAuthenticationService = userAuthenticationService;
-            _logger = logger;
-        }
+        private readonly ILogger<BookingController> _logger = logger;
+        private readonly UserAuthenticationService _userAuthenticationService = userAuthenticationService;
+        private readonly IUsersDynamoRepository _usersDynamoRepository = usersDynamoRepository;
+        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository = appointmentDynamoRepository;
 
         [Authorize("user")]
         [HttpPost("start-booking")]

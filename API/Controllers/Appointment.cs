@@ -10,16 +10,10 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AppointmentController : Controller
+    public class AppointmentController(ILogger<AppointmentController> logger, IAppointmentDynamoRepository appointmentDynamoRepository) : Controller
     {
-        private readonly ILogger<AppointmentController> _logger;
-        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository;
-
-        public AppointmentController(ILogger<AppointmentController> logger, IAppointmentDynamoRepository appointmentDynamoRepository)
-        {
-            _appointmentDynamoRepository = appointmentDynamoRepository;
-            _logger = logger;
-        }
+        private readonly ILogger<AppointmentController> _logger = logger;
+        private readonly IAppointmentDynamoRepository _appointmentDynamoRepository = appointmentDynamoRepository;
 
         [HttpGet("all")]
         public async Task<ActionResult<List<Appointment>>> GetAppointmens()

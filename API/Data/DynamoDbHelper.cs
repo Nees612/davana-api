@@ -4,7 +4,7 @@ using API.Data.DynamoDbTablesCreateRequests;
 
 namespace API.Data
 {
-    class DynamoDbHelper : IDisposable
+    public class DynamoDbHelper : IDisposable
     {
         private static readonly AmazonDynamoDBClient _client = new();
 

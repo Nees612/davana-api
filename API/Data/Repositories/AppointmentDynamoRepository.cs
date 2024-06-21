@@ -7,16 +7,10 @@ using API.Entities;
 
 namespace API.Data.Repositories
 {
-    public class AppointmentDynamoRepository : DynamoDbRepository<Appointment>, IAppointmentDynamoRepository
+    public class AppointmentDynamoRepository(IDavanaDynamoDBContext context) : DynamoDbRepository<Appointment>(context), IAppointmentDynamoRepository
     {
-        private readonly Table _table;
-        private readonly IDavanaDynamoDBContext _context;
-
-        public AppointmentDynamoRepository(IDavanaDynamoDBContext context) : base(context)
-        {
-            _context = context;
-            _table = context.Appointments;
-        }
+        private readonly Table _table = context.Appointments;
+        private readonly IDavanaDynamoDBContext _context = context;
 
         public async Task<Appointment> GetAppointment(string appointmentID)
         {

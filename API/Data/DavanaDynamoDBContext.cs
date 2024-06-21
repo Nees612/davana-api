@@ -6,18 +6,11 @@ using API.Entities;
 
 namespace API.Data
 {
-    public class DavanaDynamoDBContext : DynamoDBContext, IDavanaDynamoDBContext
+    public class DavanaDynamoDBContext(IAmazonDynamoDB client, DynamoDBContextConfig config) : DynamoDBContext(client, config), IDavanaDynamoDBContext
     {
-        public DavanaDynamoDBContext(IAmazonDynamoDB client, DynamoDBContextConfig config) : base(client, config)
-        {
-            Users = Table.LoadTable(client, "Users");
-            Coaches = Table.LoadTable(client, "Coaches");
-            Appointments = Table.LoadTable(client, "Appointments");
-        }
-
-        public Table Users { get; set; }
-        public Table Coaches { get; set; }
-        public Table Appointments { get; set; }
+        public Table Users { get; set; } = Table.LoadTable(client, "Users");
+        public Table Coaches { get; set; } = Table.LoadTable(client, "Coaches");
+        public Table Appointments { get; set; } = Table.LoadTable(client, "Appointments");
 
     }
 }

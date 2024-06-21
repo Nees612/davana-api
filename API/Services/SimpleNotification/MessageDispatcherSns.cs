@@ -5,15 +5,11 @@ using API.Services.SimpleNotification.Models;
 
 namespace API.Services.SimpleNotification
 {
-    public class MessageDispatcherSns : IMessageDispatcherSns
+    public class MessageDispatcherSns(IServiceProvider serviceProvider) : IMessageDispatcherSns
     {
-        private readonly ILogger<MessageAttributeValue> _logger;
-        private readonly IAmazonSimpleNotificationService _snsClient;
-        public MessageDispatcherSns(IServiceProvider serviceProvider)
-        {
-            _logger = serviceProvider.GetRequiredService<ILogger<MessageAttributeValue>>();
-            _snsClient = serviceProvider.GetRequiredService<IAmazonSimpleNotificationService>();
-        }
+        private readonly ILogger<MessageAttributeValue> _logger = serviceProvider.GetRequiredService<ILogger<MessageAttributeValue>>();
+        private readonly IAmazonSimpleNotificationService _snsClient = serviceProvider.GetRequiredService<IAmazonSimpleNotificationService>();
+
         public void DispatchMessages(string topicArn, IList<Message> messages, string? deduplicationId = null)
         {
             _ = topicArn ?? throw new ArgumentException("Topic Arn Cannot be empty or null", nameof(topicArn));

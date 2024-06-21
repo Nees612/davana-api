@@ -12,18 +12,11 @@ namespace API.Controllers
     [ApiController]
     [Route("api/[controller]")] // This whole api route needs authorization
     [Authorize("coach")]
-    public class CoachController : Controller
+    public class CoachController(ILogger<CoachController> logger, CoachAuthenticationService coachAuthenticationService, ICoachesDynamoRepository coachesDynamoRepository) : Controller
     {
-        private readonly ILogger<CoachController> _logger;
-        private readonly CoachAuthenticationService _coachAuthenticationService;
-        private readonly ICoachesDynamoRepository _coachesDynamoRepository;
-
-        public CoachController(ILogger<CoachController> logger, CoachAuthenticationService coachAuthenticationService, ICoachesDynamoRepository coachesDynamoRepository)
-        {
-            _coachesDynamoRepository = coachesDynamoRepository;
-            _coachAuthenticationService = coachAuthenticationService;
-            _logger = logger;
-        }
+        private readonly ILogger<CoachController> _logger = logger;
+        private readonly CoachAuthenticationService _coachAuthenticationService = coachAuthenticationService;
+        private readonly ICoachesDynamoRepository _coachesDynamoRepository = coachesDynamoRepository;
 
         [AllowAnonymous]
         [HttpGet("all")]
