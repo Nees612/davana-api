@@ -50,6 +50,7 @@ namespace API.Services.Authentication
             _ = entity.Roles ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Roles));
             _ = entity.FirstName ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.FirstName));
             _ = entity.LastName ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.LastName));
+            _ = entity.Id ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Id));
 
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, entity.EmailAddress));

@@ -66,6 +66,7 @@ namespace API.Data.Repositories
             doc["roles"] = user.Roles;
             doc["scopes"] = user.Scopes;
             doc["phoneNumber"] = user.PhoneNumber;
+            doc["emailVerified"] = user.EmailVerified;
             doc["active"] = user.Active;
             doc["createdOn"] = user.CreatedOn;
             doc["rowVersionStamp"] = user.RowVersionStamp;

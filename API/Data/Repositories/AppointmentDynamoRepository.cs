@@ -48,11 +48,14 @@ namespace API.Data.Repositories
             return appointments;
         }
 
-        public async Task<IEnumerable<Appointment>> GetAppointmentsByCoachID(string coachID)
+        public async Task<IEnumerable<Appointment>> GetAppointmentsByCoachID(string coachID, bool skipBooked = true)
         {
             ScanFilter scanFilter = new();
 
             scanFilter.AddCondition("coachID", ScanOperator.Equal, coachID);
+            scanFilter.AddCondition("active", ScanOperator.Equal, 1);
+            if (skipBooked)
+                scanFilter.AddCondition("userID", ScanOperator.IsNull);
 
             ScanOperationConfig config = new()
             {
@@ -84,7 +87,7 @@ namespace API.Data.Repositories
             doc["date"] = appointment.Date;
             doc["comment"] = appointment.Comment;
             doc["meetingType"] = appointment.MeetingType;
-            doc["userId"] = appointment.UserId;
+            doc["userId"] = null;
             doc["approoved"] = appointment.Approoved;
             doc["active"] = appointment.Active;
             doc["createdOn"] = appointment.CreatedOn;
