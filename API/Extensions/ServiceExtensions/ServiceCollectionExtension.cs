@@ -102,13 +102,6 @@ namespace API.Extensions.ServiceExtensions
             services.AddScoped<ICoachesDynamoRepository, CoachesDynamoRepository>();
             services.AddScoped<IUsersDynamoRepository, UsersDynamoRepository>();
         }
-
-        public static void InitializeAuthentication(this IServiceCollection services)
-        {
-            services.AddScoped<CoachAuthenticationService>();
-            services.AddScoped<UserAuthenticationService>();
-        }
-
         public static void InitializeMessageDispatcherSns(this IServiceCollection services)
         {
             services.AddScoped<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();

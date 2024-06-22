@@ -1,5 +1,5 @@
+using System.Text.Json;
 using Amazon.DynamoDBv2.DocumentModel;
-using API.Data.DTO;
 using API.Data.Repositories.Interfaces;
 using API.Entities;
 using API.Services.Authentication;
@@ -10,12 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // This whole api route needs authorization
+    [Route("api/[controller]")]
     [Authorize("coach")]
-    public class CoachController(ILogger<CoachController> logger, CoachAuthenticationService coachAuthenticationService, ICoachesDynamoRepository coachesDynamoRepository) : Controller
+    public class CoachController(ILogger<CoachController> logger, ICoachesDynamoRepository coachesDynamoRepository) : Controller
     {
         private readonly ILogger<CoachController> _logger = logger;
-        private readonly CoachAuthenticationService _coachAuthenticationService = coachAuthenticationService;
         private readonly ICoachesDynamoRepository _coachesDynamoRepository = coachesDynamoRepository;
 
         [AllowAnonymous]
@@ -41,7 +40,6 @@ namespace API.Controllers
 
         }
 
-        [AllowAnonymous]
         [HttpPost("coach-create")]
         public async Task<ActionResult> CreateCoach([FromBody] Coach coach)
         {
@@ -104,18 +102,18 @@ namespace API.Controllers
             if (credentials == null)
                 return new BadRequestObjectResult("Credentials cannot be empty");
 
-            //password needs to be hashed - will be hashed on Client Side           
             var coach = await _coachesDynamoRepository.CheckCoachCredentials(credentials);
 
             if (coach.Id == string.Empty)
                 return new BadRequestObjectResult("Something went Wrong");
 
-            var tokenresult = await _coachAuthenticationService.GenerateToken(coach);
+            var tokenresult = await CoachAuthenticationService.GenerateToken(coach);
 
             if (tokenresult == null)
                 return new BadRequestObjectResult("Something went wrong");
 
-            return new OkObjectResult(tokenresult);
+            var tokenAsJson = JsonSerializer.Serialize(tokenresult);
+            return new OkObjectResult(tokenAsJson);
 
         }
 

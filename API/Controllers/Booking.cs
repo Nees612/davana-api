@@ -7,10 +7,9 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookingController(ILogger<BookingController> logger, IAppointmentDynamoRepository appointmentDynamoRepository, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService) : Controller
+    public class BookingController(ILogger<BookingController> logger, IAppointmentDynamoRepository appointmentDynamoRepository, IUsersDynamoRepository usersDynamoRepository) : Controller
     {
         private readonly ILogger<BookingController> _logger = logger;
-        private readonly UserAuthenticationService _userAuthenticationService = userAuthenticationService;
         private readonly IUsersDynamoRepository _usersDynamoRepository = usersDynamoRepository;
         private readonly IAppointmentDynamoRepository _appointmentDynamoRepository = appointmentDynamoRepository;
 
@@ -22,26 +21,34 @@ namespace API.Controllers
             if (appointmentID == string.Empty)
                 return new BadRequestObjectResult("Something went wrong");
 
+            var authorizationHeader = HttpContext.Request.Headers.Authorization;
+            var userID = string.Empty;
+
+            if (authorizationHeader.ToString().StartsWith("Bearer"))
+            {
+                var accessToken = authorizationHeader.ToString().Substring("Bearer ".Length).Trim();
+                var jwtSecurityToken = await UserAuthenticationService.DecodeToken(accessToken);
+                if (jwtSecurityToken != null)
+                    userID = jwtSecurityToken.Claims.First(claim => claim.Type == "funny").Value ?? string.Empty;
+            }
+
+            if (userID == string.Empty)
+                return new BadRequestObjectResult("Something went wrong");
+
+            var user = await _usersDynamoRepository.GetUser(userID);
+
+            if (user == null)
+                return new BadRequestObjectResult("Something went wrong");
+
             var result = await _appointmentDynamoRepository.GetAppointment(appointmentID);
 
-            if (result.Id == string.Empty)
+            if (result == null)
                 return new BadRequestObjectResult("Something went wrong");
 
 
-            //Send notification to responsible Coach -- TODO 
-            //Send notification to User that the booking is in waiting for aprooval from coach
+            //Send meassge to responible coach
 
-
-            //In development i send back the whole appointment, with the user id..
-
-            var authorizationHeader = HttpContext.Request.Headers["Authorization"];
-            string accessToken = string.Empty;
-            if (authorizationHeader.ToString().StartsWith("Bearer"))
-            {
-                accessToken = authorizationHeader.ToString().Substring("Bearer ".Length).Trim();
-            }
-
-            result.UserId = int.Parse(_userAuthenticationService.DecodeToken(accessToken).Claims.First(claim => claim.Type == "funny").Value);
+            result.UserId = userID;
             return new OkObjectResult(result);
         }
 

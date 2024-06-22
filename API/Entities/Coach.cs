@@ -13,7 +13,7 @@ namespace API.Entities
         [DynamoDBProperty("firstName")]
         public string? FirstName { get; set; }
         [DynamoDBProperty("middleName")]
-        public string? MiddleName { get; set; }
+        public string? MiddleName { get; set; } = "";
         [DynamoDBProperty("lastName")]
         public string? LastName { get; set; }
 
@@ -33,7 +33,7 @@ namespace API.Entities
         public string? PhoneNumber { get; set; }
 
         [DynamoDBProperty("profileUrl")]
-        public string? ProfileImageURL { get; set; }
+        public string? ProfileImageURL { get; set; } = "";
 
         [DynamoDBProperty("aboutMe")]
         public string? AboutMe { get; set; }

@@ -5,9 +5,9 @@ namespace API.Data.Repositories.Interfaces
 {
     public interface IUsersDynamoRepository : IDynamoDBRepository<User>
     {
-        Task<User> GetUser(string id);
+        Task<User?> GetUser(string id);
         Task<bool> PutUser(User User);
         Task<IEnumerable<User>> GetUsers();
-        Task<User> CheckUserCredentials(Credentials credentials);
+        Task<User?> CheckUserCredentials(Credentials credentials);
     }
 }

@@ -8,15 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services.Authentication
 {
-    public class CoachAuthenticationService : IAuthenticationService<Coach>
+    public static class CoachAuthenticationService
     {
-        private readonly IConfigurationRoot _conf;
-        public CoachAuthenticationService()
-        {
-            _conf = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-        }
-
-        public async Task<string> GenerateToken(Coach entity)
+        private static readonly IConfigurationRoot _conf = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+        public static async Task<string> GenerateToken(Coach entity)
         {
             _ = entity ?? throw new ArgumentException("Parameter cannot be null", nameof(entity));
 
@@ -42,7 +37,7 @@ namespace API.Services.Authentication
             });
         }
 
-        private ClaimsIdentity GenerateClaims(Coach entity)
+        private static ClaimsIdentity GenerateClaims(Coach entity)
         {
             _ = entity.EmailAddress ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.EmailAddress));
             _ = entity.Scopes ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Scopes));

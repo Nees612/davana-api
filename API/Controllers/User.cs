@@ -11,10 +11,9 @@ namespace API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize("user")]
-    public class UserController(ILogger<UserController> logger, IUsersDynamoRepository usersDynamoRepository, UserAuthenticationService userAuthenticationService) : Controller
+    public class UserController(ILogger<UserController> logger, IUsersDynamoRepository usersDynamoRepository) : Controller
     {
         private readonly ILogger<UserController> _logger = logger;
-        private readonly UserAuthenticationService _userAuthenticationService = userAuthenticationService;
         private readonly IUsersDynamoRepository _usersDynamoRepository = usersDynamoRepository;
 
         // [HttpGet("all")]
@@ -37,7 +36,7 @@ namespace API.Controllers
 
             var result = await _usersDynamoRepository.GetUser(userID);
 
-            if (result.Id == string.Empty)
+            if (result == null)
                 return new BadRequestObjectResult("Something went wrong");
 
             return new OkObjectResult(result);
@@ -63,23 +62,25 @@ namespace API.Controllers
 
         }
 
-        // [AllowAnonymous]
-        // [HttpGet("verify-email/{emailHash}")]
-        // public async Task<ActionResult> VerifyUserEmail(string emailHash)
-        // {
-        //     if (emailHash == null)
-        //         return new BadRequestObjectResult("Something went wrong");
+        [AllowAnonymous]
+        [HttpGet("verify-email/{userID}")]
+        public async Task<ActionResult> VerifyUserEmail(string userID)
+        {
+            if (userID == null)
+                return new BadRequestObjectResult("Something went wrong");
 
-        //     var result = await _usersDynamoRepository.GetUserByEmailHash(emailHash);
+            var result = await _usersDynamoRepository.GetUser(userID);
 
-        //     if (result == null)
-        //         return new BadRequestObjectResult("Something went wrong");
+            if (result == null)
+                return new BadRequestObjectResult("Something went wrong");
 
-        //     result.EmailVerified = 1;
+            result.EmailVerified = 1;
 
-        //     return await _usersDynamoRepository.Update(result);
+            await _usersDynamoRepository.SaveAsync(result);
 
-        // }
+            return new OkObjectResult($"User: {userID}\n Email verification is successful");
+
+        }
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -93,7 +94,7 @@ namespace API.Controllers
             if (result == null)
                 return new BadRequestObjectResult("Something went wrong");
 
-            var tokenresult = await _userAuthenticationService.GenerateToken(result);
+            var tokenresult = await UserAuthenticationService.GenerateToken(result);
 
             if (tokenresult == null)
                 return new BadRequestObjectResult("Something wnet wrong");

@@ -12,7 +12,7 @@ namespace API.Data.Repositories
         private readonly Table _table = context.Appointments;
         private readonly IDavanaDynamoDBContext _context = context;
 
-        public async Task<Appointment> GetAppointment(string appointmentID)
+        public async Task<Appointment?> GetAppointment(string appointmentID)
         {
             GetItemOperationConfig config = new()
             {
@@ -20,10 +20,20 @@ namespace API.Data.Repositories
                 ConsistentRead = true
             };
 
-            var result = await _table.GetItemAsync(appointmentID, config);
-            Appointment appointment = _context.FromDocument<Appointment>(result);
+            try
+            {
+                var result = await _table.GetItemAsync(appointmentID, config);
+                Appointment appointment = _context.FromDocument<Appointment>(result);
 
-            return appointment;
+                return appointment;
+
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return null;
+            }
+
         }
 
         public async Task<IEnumerable<Appointment>> GetAppointments()

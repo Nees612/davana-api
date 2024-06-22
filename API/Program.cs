@@ -10,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-builder.Services.InitializeLogger();
+//builder.Services.InitializeLogger();
 
 builder.Services.InitializeCorsPolicy(conf);
 
@@ -24,7 +24,6 @@ builder.Services.InitializeDynamoDBContext(conf);
 
 builder.Services.InitializeReposytories();
 
-builder.Services.InitializeAuthentication();
 #endregion
 
 var app = builder.Build();

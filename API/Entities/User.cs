@@ -12,7 +12,7 @@ namespace API.Entities
         [DynamoDBProperty("firstName")]
         public string? FirstName { get; set; }
         [DynamoDBProperty("middleName")]
-        public string? MiddleName { get; set; }
+        public string? MiddleName { get; set; } = "";
         [DynamoDBProperty("lastName")]
         public string? LastName { get; set; }
         [DynamoDBProperty("emailAddress")]
@@ -20,11 +20,11 @@ namespace API.Entities
         [DynamoDBProperty("passwordHash")]
         public string? PasswordHash { get; set; }
         [DynamoDBProperty("roles")]
-        public string[]? Roles { get; set; }
+        public string[]? Roles { get; set; } = ["user"];
         [DynamoDBProperty("scopes")]
-        public string[]? Scopes { get; set; }
+        public string[]? Scopes { get; set; } = ["booking"];
         [DynamoDBProperty("phoneNumber")]
-        public string? PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = "";
         [DynamoDBProperty("emailVerified")]
         public int EmailVerified { get; set; } = 0;
     }

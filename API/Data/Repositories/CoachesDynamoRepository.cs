@@ -30,7 +30,9 @@ namespace API.Data.Repositories
             var result = await search.GetNextSetAsync();
             Coach coach = _context.FromDocument<Coach>(result[0]);
 
-            return coach;
+            var verificationResult = BCrypt.Net.BCrypt.Verify(credentials.PasswordHash, coach.PasswordHash);
+
+            return verificationResult ? coach : new Coach { };
         }
 
         public async Task<Coach> GetCoach(string id)
@@ -72,6 +74,9 @@ namespace API.Data.Repositories
         public async Task<bool> PutCoach(Coach coach)
         {
             var doc = new Document();
+
+            coach.Id = Guid.NewGuid().ToString();
+            coach.PasswordHash = BCrypt.Net.BCrypt.HashPassword(coach.PasswordHash);
 
             doc["Id"] = coach.Id;
             doc["firstName"] = coach.FirstName;

@@ -1,5 +1,3 @@
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using API.Data.DTO;
 using API.Data.Repositories.Interfaces;
@@ -13,12 +11,12 @@ namespace API.Data.Repositories
         private readonly Table _table = context.Users;
         private readonly IDavanaDynamoDBContext _context = context;
 
-        public async Task<User> CheckUserCredentials(Credentials credentials)
+        public async Task<User?> CheckUserCredentials(Credentials credentials)
         {
             ScanFilter scanFilter = new();
 
             scanFilter.AddCondition("emailAddress", ScanOperator.Equal, credentials.Emailaddress);
-            scanFilter.AddCondition("passwordHash", ScanOperator.Equal, credentials.PasswordHash);
+            // scanFilter.AddCondition("passwordHash", ScanOperator.Equal, credentials.PasswordHash);
 
             ScanOperationConfig config = new()
             {
@@ -31,10 +29,12 @@ namespace API.Data.Repositories
             var result = await search.GetNextSetAsync();
             User user = _context.FromDocument<User>(result[0]);
 
-            return user;
+            var verificationResult = BCrypt.Net.BCrypt.Verify(credentials.PasswordHash, user.PasswordHash);
+
+            return verificationResult ? user : null;
         }
 
-        public async Task<User> GetUser(string id)
+        public async Task<User?> GetUser(string id)
         {
             GetItemOperationConfig config = new()
             {
@@ -42,10 +42,20 @@ namespace API.Data.Repositories
                 ConsistentRead = true
             };
 
-            var result = await _table.GetItemAsync(id, config);
-            User user = _context.FromDocument<User>(result);
+            try
+            {
+                var result = await _table.GetItemAsync(id, config);
+                User user = _context.FromDocument<User>(result);
 
-            return user;
+                return user;
+            }
+            catch (Exception ex)
+            {
+                //Log error
+                return null;
+
+            }
+
         }
 
         public Task<IEnumerable<User>> GetUsers()
@@ -56,6 +66,9 @@ namespace API.Data.Repositories
         public async Task<bool> PutUser(User user)
         {
             var doc = new Document();
+
+            user.Id = Guid.NewGuid().ToString();
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
 
             doc["Id"] = user.Id;
             doc["firstName"] = user.FirstName;
@@ -82,5 +95,6 @@ namespace API.Data.Repositories
 
             return true;
         }
+
     }
 }

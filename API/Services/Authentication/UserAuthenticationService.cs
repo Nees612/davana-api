@@ -9,15 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services.Authentication
 {
-    public class UserAuthenticationService : IAuthenticationService<User>
+    public static class UserAuthenticationService
     {
-        private readonly IConfigurationRoot _conf;
-        public UserAuthenticationService()
-        {
-            _conf = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-        }
-
-        public async Task<string> GenerateToken(User entity)
+        private static readonly IConfigurationRoot _conf = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+        public static async Task<string> GenerateToken(User entity)
         {
             _ = entity ?? throw new ArgumentException("Parameter cannot be null", nameof(entity));
 
@@ -43,7 +38,7 @@ namespace API.Services.Authentication
             });
         }
 
-        private ClaimsIdentity GenerateClaims(User entity)
+        private static ClaimsIdentity GenerateClaims(User entity)
         {
             _ = entity.EmailAddress ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.EmailAddress));
             _ = entity.Scopes ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Scopes));
@@ -53,6 +48,7 @@ namespace API.Services.Authentication
             _ = entity.Id ?? throw new ArgumentException("Parameter cannot be null", nameof(entity.Id));
 
             var claims = new ClaimsIdentity();
+
             claims.AddClaim(new Claim(ClaimTypes.Name, entity.EmailAddress));
             claims.AddClaim(new Claim("sub", entity.EmailAddress));
             claims.AddClaim(new Claim("name", $"{entity.FirstName} {entity.LastName}"));
@@ -73,14 +69,26 @@ namespace API.Services.Authentication
             return claims;
         }
 
-        public JwtSecurityToken DecodeToken(string encodedJWT)
+        public static async Task<JwtSecurityToken?> DecodeToken(string encodedJWT)
         {
             _ = encodedJWT ?? throw new ArgumentException("Parameter cannot be null", nameof(encodedJWT));
 
-            var handler = new JwtSecurityTokenHandler();
-            return handler.ReadJwtToken(encodedJWT);
+            return await Task.Run(() =>
+            {
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtSecurityToken;
+
+                try
+                {
+                    jwtSecurityToken = handler.ReadJwtToken(encodedJWT);
+                }
+                catch (Exception ex)
+                {
+                    //Log the erorr;
+                    return null;
+                }
+                return jwtSecurityToken;
+            });
         }
-
-
     }
 }

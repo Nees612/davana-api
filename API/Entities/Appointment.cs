@@ -16,7 +16,7 @@ namespace API.Entities
         [DynamoDBProperty("meetingType")]
         public string? MeetingType { get; set; }
         [DynamoDBProperty("userId")]
-        public int UserId { get; set; } = 0;
+        public string? UserId { get; set; } = "";
         [DynamoDBProperty("approoved")]
         public int Approoved { get; set; } = 0;
 
