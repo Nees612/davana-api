@@ -32,7 +32,7 @@ namespace API.Extensions.ServiceExtensions
             {
                 options.AddPolicy(myCorsPolicy, policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200");
+                    policy.WithOrigins("http://localhost:4200", "http://davana-healing-landing-v1.s3-website-eu-west-1.amazonaws.com");
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
                 });

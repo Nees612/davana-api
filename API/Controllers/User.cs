@@ -22,12 +22,6 @@ namespace API.Controllers
         //     return new OkObjectResult(await _usersDynamoRepository.GetUsers());
         // }
 
-        [HttpGet("isTokenValid")]
-        public async Task<ActionResult> IsTokenValid()
-        {
-            return await Task.Run(() => { return new OkObjectResult(true); });
-        }
-
         [HttpGet("user/{userID}")]
         public async Task<ActionResult<User>> GetUser(string userID)
         {

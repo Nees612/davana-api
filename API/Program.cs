@@ -6,23 +6,25 @@ var conf = builder.Configuration;
 #region builder.Services.Add* and builder.Services.Ini*
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-//builder.Services.InitializeLogger();
+builder.Services.InitializeLogger();
 
 builder.Services.InitializeCorsPolicy(conf);
 
 builder.Services.InitializePolicyValidation(conf);
 
-builder.Services.InitializeAWSOptions(conf);
+//builder.Services.InitializeAWSOptions(conf);
 
 builder.Services.InitializeMessageDispatcherSns();
 
 builder.Services.InitializeDynamoDBContext(conf);
 
 builder.Services.InitializeReposytories();
+
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 
 #endregion
 
